@@ -4,7 +4,8 @@ VALUES
 ('Sales'),
 ('Finance'),
 ('Human Resources'),
-('Legal');
+('Legal')
+('Managers');
 
 
 INSERT INTO roles(title, salary, department_id)
@@ -14,7 +15,7 @@ VALUES
 ('Accountant', 97000, 3);
 ('HR', 95000, 4),
 ('Legal Team Lead', 120000, 5);
-('Product Manager', 120000, 6);
+('Product Manager', 250000, 6);
 
 
 
@@ -28,3 +29,4 @@ VALUES
 ('Mark', 'Green', 1),
 ('Andre', 'Twain', 3);
 
+UPDATE `employeeTracker_DB`.`employees` SET `manager_id` = '6' WHERE (`id` > '6');
