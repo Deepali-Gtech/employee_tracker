@@ -1,6 +1,6 @@
-const { connect } = require('http2');
+
 const mysql = require('mysql');
-const { connected } = require('process');
+const inquirer = require('inquirer');
 
 const connection = mysql.createConnection({
   host: 'localhost',
