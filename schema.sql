@@ -5,7 +5,7 @@ USE employeeTracker_DB;
 
 CREATE TABLE department(
   id INT AUTO_INCREMENT NOT NULL,
-  name_department VARCHAR(30) NOT NULL,
+  name VARCHAR(30) NOT NULL,
   PRIMARY KEY (id)
 );
 
@@ -14,7 +14,7 @@ CREATE TABLE roles (
 title VARCHAR(30) NOT NULL,
 salary DECIMAL(9,3),
 department_id INT,
-FOREIGN KEY(department_id) REFERENCES departments(id),
+FOREIGN KEY(department_id) REFERENCES department(id),
 PRIMARY KEY (id)
 );
 
@@ -25,6 +25,6 @@ last_name VARCHAR(30) NOT NULL,
 role_id INT,
 manager_id INT,
 FOREIGN KEY(role_id) REFERENCES roles(id),
-FOREIGN KEY(manager_id) REFERENCES employees(id)
+FOREIGN KEY(manager_id) REFERENCES employees(id),
 PRIMARY KEY (id)
 );
