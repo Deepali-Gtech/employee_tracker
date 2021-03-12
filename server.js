@@ -50,7 +50,42 @@ function processChoice(choice, callback) {
                 console.table(result);
                 callback();
               });            
-        })
+        });
+    } else if (choice === "Remove Employee") {
+        connection.connect((err) => {
+            connection.query("SELECT * FROM employeeTracker_DB.employees", function (err, result, fields) {
+                if (err) throw err;
+
+                var employeeNames = [];
+                result.forEach(element => {
+                    employeeNames.push(element.first_name + " " + element.last_name);
+                });
+                console.log(employeeNames);
+                inquirer.prompt([
+                    {
+                        type: "list",
+                        message: "Which employee you want to remove?",
+                        choices: employeeNames,
+                        name: "employeeNameSelected"
+                    }
+                ]
+                ).then(function ({ employeeNameSelected }) {
+                    console.log("employeeNameSelected --> "+ employeeNameSelected);
+                    var splitName = employeeNameSelected.split(" ");
+                    var firstName = splitName[0];
+                    var lastName = splitName[1];
+                    var deleteQuery = "DELETE FROM employeeTracker_DB.employees where first_name = '" + firstName + "' AND last_name = '" + lastName + "'";
+                    console.log("My dlete query--> "+ deleteQuery);
+                    connection.query(deleteQuery, function (err, result) {
+                        if (err) throw err;
+                        console.log("Number of records deleted: " + result.affectedRows);
+                        callback();  
+                    });
+                    
+                });
+                
+              });            
+        });
     } else {
         callback();
     }
