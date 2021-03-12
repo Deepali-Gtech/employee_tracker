@@ -15,9 +15,9 @@ const connection = mysql.createConnection({
   password: 'password',
   database: 'employeeTracker_DB',
 });
-connection.connect((err) => {
-    if (err) throw err;
-    console.log("connected");
 
-   
-  });
+
+connection.query("SELECT * FROM employeeTracker_DB.employees", function (err, result, fields) {
+  if (err) throw err;
+  console.log(result);
+});
