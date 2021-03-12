@@ -26,6 +26,7 @@ function init() {
                 "Remove Employee",
                 "View Department",
                 "Add Department",
+                "View Role",
                 "Exit"
             ],
             name: "choice"
@@ -193,7 +194,20 @@ function processChoice(choice, callback) {
 
         });
 
+    }else if(choice === "View Role"){
+        connection.connect((err) => {
+            connection.query("SELECT * FROM employeeTracker_DB.roles", function (err, result, fields) {
+                if (err) throw err;
+                console.table(result);
+                callback();
+            });
+        });
+
     }
+
+
+
 }
+
 
 init();
