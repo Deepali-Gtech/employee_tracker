@@ -3,17 +3,17 @@ const inquirer = require('inquirer');
 
 const connection = mysql.createConnection({
     host: 'localhost',
-  
+
     // Your port, if not 3306
     port: 3306,
-  
+
     // Your username
     user: 'root',
-  
+
     // Be sure to update with your own MySQL password!
     password: 'password',
     database: 'employeeTracker_DB',
-  });
+});
 
 function init() {
     inquirer.prompt([
@@ -24,6 +24,8 @@ function init() {
                 "View All Employees",
                 "Add Employee",
                 "Remove Employee",
+                "View Department",
+                "Add Department",
                 "Exit"
             ],
             name: "choice"
@@ -31,13 +33,13 @@ function init() {
     ]
     ).then(function ({ choice }) {
         if (choice != "Exit") {
-            processChoice(choice, function() {
+            processChoice(choice, function () {
                 init();
             })
         } else {
             process.exit();
-        } 
-        console.log("I am here. Choice here is --> "+ choice);
+        }
+        console.log("I am here. Choice here is --> " + choice);
     });
 }
 
@@ -49,7 +51,7 @@ function processChoice(choice, callback) {
                 if (err) throw err;
                 console.table(result);
                 callback();
-              });            
+            });
         });
     } else if (choice === "Remove Employee") {
         connection.connect((err) => {
@@ -60,7 +62,7 @@ function processChoice(choice, callback) {
                 result.forEach(element => {
                     employeeNames.push(element.first_name + " " + element.last_name);
                 });
-                
+
                 inquirer.prompt([
                     {
                         type: "list",
@@ -77,10 +79,10 @@ function processChoice(choice, callback) {
                     connection.query(deleteQuery, function (err, result) {
                         if (err) throw err;
                         console.log("Number of records deleted: " + result.affectedRows);
-                        callback();  
-                    });                  
-                });               
-              });            
+                        callback();
+                    });
+                });
+            });
         });
     } else if (choice === "Add Employee") {
         connection.connect((err) => {
@@ -97,7 +99,7 @@ function processChoice(choice, callback) {
                     result.forEach(element => {
                         roles.push(element.title);
                     });
-                    
+
                     inquirer.prompt([
                         {
                             message: "What is first name?",
@@ -119,8 +121,9 @@ function processChoice(choice, callback) {
                             choices: employeeNames,
                             name: "managerSelected"
                         }
+
                     ]
-                    ).then(function ({ suppliedFirstName, suppliedLastName, roleSelected, managerSelected}) {
+                    ).then(function ({ suppliedFirstName, suppliedLastName, roleSelected, managerSelected }) {
                         var getRoleFromTitle = "SELECT * FROM employeeTracker_DB.roles where title = '" + roleSelected + "'";
                         connection.query(getRoleFromTitle, function (err, result, fields) {
                             if (err) throw err;
@@ -137,19 +140,59 @@ function processChoice(choice, callback) {
                                 connection.query(insertQuery, function (err, result) {
                                     if (err) throw err;
                                     console.log("Number of records added: " + result.affectedRows);
-                                    callback();  
-                                });   
+                                    callback();
+                                });
                             });
-                            
+
                         });
-                        
-                    });                  
+
+                    });
                 });
             });
         });
-    } 
-    else {
-        callback();
+    }
+    else if (choice === "View Department") {
+        connection.connect((err) => {
+            connection.query("SELECT * FROM employeeTracker_DB.department", function (err, result, fields) {
+                if (err) throw err;
+                console.table(result);
+
+                callback();
+            });
+
+
+        });
+
+    } else if (choice === "Add Department") {
+        connection.connect((err) => {
+            connection.query("SELECT * FROM employeeTracker_DB.department", function (err, result, fields) {
+                var departmentName = [];
+                result.forEach(element => {
+                    departmentName.push(" " + element.name);
+                });
+                inquirer.prompt([
+                    {
+                        message: "What is department name?",
+                        name: "suppliedDepartmentName"
+                    }
+                ]
+                ).then(function ({ suppliedDepartmentName }) {
+                    var getDepartmentGivenName = "INSERT INTO department(name) VALUES('" + suppliedDepartmentName + "')";
+                    connection.query(getDepartmentGivenName, function (err, result, fields) {
+                        if (err) throw err;
+                        callback();
+                    });
+
+                });
+
+
+
+
+
+            });
+
+        });
+
     }
 }
 
