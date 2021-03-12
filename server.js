@@ -27,6 +27,7 @@ function init() {
                 "View Department",
                 "Add Department",
                 "View Role",
+                "Add Role",
                 "Exit"
             ],
             name: "choice"
@@ -194,13 +195,57 @@ function processChoice(choice, callback) {
 
         });
 
-    }else if(choice === "View Role"){
+    } else if (choice === "View Role") {
         connection.connect((err) => {
             connection.query("SELECT * FROM employeeTracker_DB.roles", function (err, result, fields) {
                 if (err) throw err;
                 console.table(result);
                 callback();
             });
+        });
+
+    } else if (choice === "Add Role") {
+        connection.connect((err) => {
+            connection.query("SELECT * FROM employeeTracker_DB.department", function (err, result, fields) {
+                if (err) throw err;
+                var deprt = [];
+                result.forEach(element => {
+                    deprt.push(element.name);
+                });
+
+                inquirer.prompt([
+                    {
+                        message: "What is role name?",
+                        name: "suppliedRoleName"
+                    },
+                    {
+                        message: "What is salary for this role?",
+                        name: "suppliedRoleSalary"
+                    },
+                    {
+                        type: "list",
+                        message: "Select department for this role?",
+                        choices: deprt,
+                        name: "selectedDepart"
+                    }
+
+                ]
+                ).then(function ({ suppliedRoleName, suppliedRoleSalary, selectedDepart }) {
+                    var getDepartmentFromName = "SELECT * FROM employeeTracker_DB.department where name = '" + selectedDepart + "'";
+                    connection.query(getDepartmentFromName, function (err, result, fields) {
+                        if (err) throw err;
+                        var insertNewRole = "INSERT INTO roles(title, salary, department_id) VALUES('" + suppliedRoleName + "', '" + suppliedRoleSalary + "', '" + result[0].id + "')";
+                        connection.query(insertNewRole, function (err, result, fields) {
+                            if (err) throw err;
+                            console.log("Rows impacted:" + result);
+                            callback();
+                        });
+                    });
+                    
+
+                });
+            });
+
         });
 
     }
