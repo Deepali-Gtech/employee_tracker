@@ -60,7 +60,7 @@ function processChoice(choice, callback) {
                 result.forEach(element => {
                     employeeNames.push(element.first_name + " " + element.last_name);
                 });
-                console.log(employeeNames);
+                
                 inquirer.prompt([
                     {
                         type: "list",
@@ -70,23 +70,85 @@ function processChoice(choice, callback) {
                     }
                 ]
                 ).then(function ({ employeeNameSelected }) {
-                    console.log("employeeNameSelected --> "+ employeeNameSelected);
                     var splitName = employeeNameSelected.split(" ");
                     var firstName = splitName[0];
                     var lastName = splitName[1];
                     var deleteQuery = "DELETE FROM employeeTracker_DB.employees where first_name = '" + firstName + "' AND last_name = '" + lastName + "'";
-                    console.log("My dlete query--> "+ deleteQuery);
                     connection.query(deleteQuery, function (err, result) {
                         if (err) throw err;
                         console.log("Number of records deleted: " + result.affectedRows);
                         callback();  
-                    });
-                    
-                });
-                
+                    });                  
+                });               
               });            
         });
-    } else {
+    } else if (choice === "Add Employee") {
+        connection.connect((err) => {
+            connection.query("SELECT * FROM employeeTracker_DB.employees", function (err, result, fields) {
+                if (err) throw err;
+                var employeeNames = [];
+                result.forEach(element => {
+                    employeeNames.push(element.first_name + " " + element.last_name);
+                });
+
+                connection.query("SELECT * FROM employeeTracker_DB.roles", function (err, result, fields) {
+                    if (err) throw err;
+                    var roles = [];
+                    result.forEach(element => {
+                        roles.push(element.title);
+                    });
+                    
+                    inquirer.prompt([
+                        {
+                            message: "What is first name?",
+                            name: "suppliedFirstName"
+                        },
+                        {
+                            message: "What is last name?",
+                            name: "suppliedLastName"
+                        },
+                        {
+                            type: "list",
+                            message: "Select employee role",
+                            choices: roles,
+                            name: "roleSelected"
+                        },
+                        {
+                            type: "list",
+                            message: "Select employee manager",
+                            choices: employeeNames,
+                            name: "managerSelected"
+                        }
+                    ]
+                    ).then(function ({ suppliedFirstName, suppliedLastName, roleSelected, managerSelected}) {
+                        var getRoleFromTitle = "SELECT * FROM employeeTracker_DB.roles where title = '" + roleSelected + "'";
+                        connection.query(getRoleFromTitle, function (err, result, fields) {
+                            if (err) throw err;
+                            var roleId = result[0].id;
+                            var splitName = managerSelected.split(" ");
+                            var firstName = splitName[0];
+                            var lastName = splitName[1];
+                            var getEmployeeFromName = "Select * from employeeTracker_DB.employees where first_name = '" + firstName + "' AND last_name = '" + lastName + "'";
+                            connection.query(getEmployeeFromName, function (err, result, fields) {
+                                if (err) throw err;
+                                var managerId = result[0].id;
+                                var insertQuery = "INSERT INTO employees(first_name, last_name, role_id, manager_id) VALUES ('" + suppliedFirstName + "', '" + suppliedLastName + "', " + roleId + ", " + managerId + ")";
+                                console.log(insertQuery);
+                                connection.query(insertQuery, function (err, result) {
+                                    if (err) throw err;
+                                    console.log("Number of records added: " + result.affectedRows);
+                                    callback();  
+                                });   
+                            });
+                            
+                        });
+                        
+                    });                  
+                });
+            });
+        });
+    } 
+    else {
         callback();
     }
 }
