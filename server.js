@@ -24,9 +24,9 @@ function init() {
                 "View All Employees",
                 "Add Employee",
                 "Remove Employee",
-                "View Department",
+                "View All Departments",
                 "Add Department",
-                "View Role",
+                "View All Roles",
                 "Add Role",
                 "Update Employee Role",
                 "Exit"
@@ -154,7 +154,7 @@ function processChoice(choice, callback) {
             });
         });
     }
-    else if (choice === "View Department") {
+    else if (choice === "View All Departments") {
         connection.connect((err) => {
             connection.query("SELECT * FROM employeeTracker_DB.department", function (err, result, fields) {
                 if (err) throw err;
@@ -191,7 +191,7 @@ function processChoice(choice, callback) {
 
         });
 
-    } else if (choice === "View Role") {
+    } else if (choice === "View All Roles") {
         connection.connect((err) => {
             connection.query("SELECT * FROM employeeTracker_DB.roles", function (err, result, fields) {
                 if (err) throw err;
