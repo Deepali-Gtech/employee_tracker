@@ -48,25 +48,34 @@ function init() {
 
 function processChoice(choice, callback) {
     console.log("Got choice-> " + choice);
-    if (choice === "View All Employees") {
-        viewAllEmployees(callback);
-    } else if (choice === "Remove Employee") {
-        removeEmployee(callback);
-    } else if (choice === "Add Employee") {
-        addEmployee(callback);
-    }
-    else if (choice === "View All Departments") {
-        viewAllDepartments(callback);
-    } else if (choice === "Add Department") {
-        addDepartment(callback);
-    } else if (choice === "View All Roles") {
-        viewAllRoles(callback);
-    } else if (choice === "Add Role") {
-        addRole(callback);
-    } else if (choice === "Update Employee Role") {
-        updateEmployeeRole(callback);
-    }
-
+    switch (choice) {
+        case 'View All Employees':
+            viewAllEmployees(callback);
+            break;
+        case 'Remove Employee':
+            removeEmployee(callback);
+            break;
+        case 'Add Employee':
+            addEmployee(callback);
+            break;
+        case 'View All Departments':
+            viewAllDepartments(callback);
+            break;
+        case 'Add Department':
+            addDepartment(callback);
+            break;  
+        case 'View All Roles':
+            viewAllRoles(callback);
+            break;  
+        case 'Add Role':
+            addRole(callback);
+            break;
+        case 'Update Employee Role':
+            updateEmployeeRole(callback);
+            break;                      
+        default:
+            callback();
+      }
 }
 
 function updateEmployeeRole(callback) {
