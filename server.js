@@ -28,6 +28,7 @@ function init() {
                 "Add Department",
                 "View Role",
                 "Add Role",
+                "Update Employee Role",
                 "Exit"
             ],
             name: "choice"
@@ -186,11 +187,6 @@ function processChoice(choice, callback) {
                     });
 
                 });
-
-
-
-
-
             });
 
         });
@@ -241,16 +237,64 @@ function processChoice(choice, callback) {
                             callback();
                         });
                     });
-                    
-
                 });
             });
-
         });
 
+    } else if (choice === "Update Employee Role") {
+        connection.connect((err) => {
+            connection.query("SELECT * FROM employeeTracker_DB.employees", function (err, result, fields) {
+                if (err) throw err;
+                var employees = [];
+                result.forEach(element => {
+                    employees.push(element.first_name + " " + element.last_name);
+                });
+                connection.query("SELECT * FROM employeeTracker_DB.roles", function (err, result, fields) {
+                    if (err) throw err;
+                    var roles = [];
+                    result.forEach(element => {
+                        roles.push(element.title);
+                    });
+                    inquirer.prompt([
+                        {
+                            type: "list",
+                            message: "Which employee you want to update?",
+                            choices: employees,
+                            name: "employeeSelectedForUpdate"
+                        },
+                        {
+                            type: "list",
+                            message: "Select employee role for update?",
+                            choices: roles,
+                            name: "roleSelectedForUpdate"
+                        }
+                    ]
+                    ).then(function ({ employeeSelectedForUpdate, roleSelectedForUpdate }) {
+                        var splitUpdatedName = employeeSelectedForUpdate.split(" ");
+                        var toBeUpdatedFirstName = splitUpdatedName[0];
+                        var toBeUpdatedLastName = splitUpdatedName[1];
+                        var selectedEmployeeQuery = "SELECT * FROM employeeTracker_DB.employees where first_name = '" + toBeUpdatedFirstName + "' AND last_name = '" + toBeUpdatedLastName + "'";
+                        connection.query(selectedEmployeeQuery, function (err, result) {
+                            if (err) throw err;
+                            var toBeUpdatedEmployeeId = result[0].id;
+                            var selectedRoleQuery = "SELECT * FROM employeeTracker_DB.roles where title = '" + roleSelectedForUpdate + "'";
+                            connection.query(selectedRoleQuery, function (err, result) {
+                                if (err) throw err;
+                                var toBeUpdatedRoleId = result[0].id;
+                                var updateQuery = "UPDATE employeeTracker_DB.employees SET role_id = " + toBeUpdatedRoleId + " where id = " + toBeUpdatedEmployeeId;
+                                connection.query(updateQuery, function (err, result) {
+                                    if (err) throw err;
+                                    console.log("Number of records updated: " + result.affectedRows);
+                                    callback();
+                                });
+                            });
+                        });
+                    });
+                });
+
+            });
+        });
     }
-
-
 
 }
 
